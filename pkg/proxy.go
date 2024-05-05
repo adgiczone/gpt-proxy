@@ -55,6 +55,7 @@ func getJWTStandardClaims(pubKey *rsa.PublicKey, jwtToken string) (string, error
 }
 
 func (s *LittleProxy) sendToTarget(url string, token string, msg string) (string, error) {
+	log.Info("")
 	req, err := http.NewRequest("POST", url, bytes.NewBufferString(msg))
 	if err != nil {
 		log.Error("Error creating request:", err)
@@ -93,6 +94,7 @@ func writeResponse(w http.ResponseWriter, msg string, code int) {
 
 func (s *LittleProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	method := r.Method
+	log.Infof("get method:%s", method)
 	if method != http.MethodPost {
 		writeResponse(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return

@@ -2,12 +2,13 @@ package main
 
 import (
 	"flag"
-	proxy "little-gpt/proxy/pkg"
 	"os"
 	"os/signal"
 	"syscall"
 
 	log "github.com/sirupsen/logrus"
+
+	proxy "little-gpt/gpt-proxy/pkg"
 )
 
 var (
@@ -33,6 +34,7 @@ func main() {
 	}()
 	log.Info("proxy server started at:", port)
 	sigs := make(chan os.Signal, 3)
+
 	signal.Notify(sigs, os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
 	for sig := range sigs {
 		log.Infof("receive signal %s, server exited", sig.String())
