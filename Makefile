@@ -10,7 +10,6 @@ arch?=amd64
 cgo?=
 cc?=
 
-
 IMAGE_FLAGS :=
 IMAGE_FLAGS := $(IMAGE_FLAGS) --build-arg baseBuilderImage=$(baseBuilderImage)
 IMAGE_FLAGS := $(IMAGE_FLAGS) --build-arg baseImage=$(baseImage)

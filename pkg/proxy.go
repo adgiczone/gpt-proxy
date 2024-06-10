@@ -121,7 +121,7 @@ func (s *LittleProxy) Proxy(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp, err := s.sendToTarget(c.url, authToken, c.content)
+	resp, err := s.sendToTarget(c.Url, authToken, c.Content)
 	if err != nil {
 		log.Error("Send to Target fail", err)
 		writeResponse(w, "Send to target url fail", http.StatusInternalServerError)
