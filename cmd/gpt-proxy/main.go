@@ -9,6 +9,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	proxy "little-gpt/gpt-proxy/pkg"
+	version "little-gpt/gpt-proxy/version"
 )
 
 var (
@@ -21,6 +22,13 @@ var (
 
 func main() {
 	flag.Parse()
+	if *printVersion {
+		if *printVersion {
+			version.PrintFullVersionInfo()
+			return
+		}
+	}
+
 	port := *port
 	timeout := *timeout
 	srv, err := proxy.New(port, timeout, *certPath, *keyPath)

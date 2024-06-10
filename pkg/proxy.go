@@ -25,9 +25,8 @@ type LittleProxy struct {
 }
 
 type content struct {
-	url     string
-	token   string
-	content string
+	Url     string `json:"url"`
+	Content string `json:"content"`
 }
 
 func GetPubKeyFromFile(filePath string) (*rsa.PublicKey, error) {
@@ -64,7 +63,7 @@ func (s *LittleProxy) sendToTarget(url string, token string, msg string) (string
 
 	req.Header.Set("Content-Type", "application/json")
 	if len(token) != 0 {
-		req.Header.Set("Authorization", fmt.Sprintf("Bearer: %s", token))
+		req.Header.Set("Authorization", token)
 	}
 
 	client := &http.Client{}
@@ -92,13 +91,20 @@ func writeResponse(w http.ResponseWriter, msg string, code int) {
 	}
 }
 
-func (s *LittleProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (s *LittleProxy) Proxy(w http.ResponseWriter, r *http.Request) {
 	method := r.Method
 	log.Infof("get method:%s", method)
 	if method != http.MethodPost {
 		writeResponse(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+
+	authToken := r.Header.Get("Authorization")
+	if authToken == "" {
+		writeResponse(w, "Authorization fail", http.StatusBadRequest)
+		return
+	}
+
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		log.Error("read request body error", err)
@@ -115,7 +121,7 @@ func (s *LittleProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp, err := s.sendToTarget(c.url, c.token, c.content)
+	resp, err := s.sendToTarget(c.url, authToken, c.content)
 	if err != nil {
 		log.Error("Send to Target fail", err)
 		writeResponse(w, "Send to target url fail", http.StatusInternalServerError)
@@ -139,9 +145,12 @@ func (s *LittleProxy) Serv() error {
 	address := fmt.Sprintf(":%d", s.port)
 	log.Info("Start listen at ", address)
 
+	mux := http.NewServeMux()
+	mux.HandleFunc("/proxy", s.Proxy)
+
 	srv := http.Server{
 		Addr:              address,
-		Handler:           s,
+		Handler:           mux,
 		ReadHeaderTimeout: time.Duration(s.timeout) * time.Second,
 	}
 

@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  proxy:
+    image: nekopadia/gpt-proxy:v0.0.1-a38ab9e-amd64
+    ports:
+      - "8080:8080"
+    command: [ "./gpt-proxy" ]
+    volumes:
+      - /etc/nginx/cert:/gpt-proxy/cert:ro
+    restart: always
